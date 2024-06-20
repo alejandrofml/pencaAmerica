@@ -1,0 +1,94 @@
+body {
+    background: url('../img/fondo.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo semitransparente */
+    padding: 1rem;
+}
+
+header h1 {
+    font-size: 2rem;
+}
+
+nav.navbar {
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo semitransparente */
+}
+
+nav.navbar a {
+    color: rgb(50, 80, 234);
+}
+
+nav.navbar a:hover{
+    color: rgb(234, 50, 50);
+}
+main.container {
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo semitransparente */
+    padding: 2rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: black;
+}
+
+.card-header {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+}
+
+.card-admin {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: black;
+}
+
+.form-control,
+.form-floating label {
+    color: black;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    display: block;
+    margin: 0 auto;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.alert {
+    color: black;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: black; /* Cambia el color de las flechas a negro */
+}
+
+.form-group, .form-floating {
+    text-align: center;
+}
+
+input[type="text"], input[type="password"], input[type="number"] {
+    margin: 0 auto;
+    display: block;
+}
+
+#partidos-container {
+    margin: 0 auto;
+}
+
+#resultados-partidos .card-admin {
+    margin: 1rem auto;
+}
+
+#alert-container {
+    margin-bottom: 1rem;
+}
