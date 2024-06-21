@@ -120,15 +120,25 @@ const iniciarSesion = async (usuario, contrasena) => {
             const data = await response.json();
             const usuarios = data.record.usuarios || [];
             const jugadas = data.record.jugadas || [];
-            const usuarioExistente = usuarios.find(u => u.usuario === usuario && u.contrasena === contrasena);
+
+            const usuarioExistente = usuarios.find(u => u.usuario.toLowerCase() === usuario.toLowerCase() && u.contrasena === contrasena);
             if (usuarioExistente) {
                 usuarioActual = {
                     ...usuarioExistente,
-                    jugadas: jugadas.filter(j => j.usuario === usuario)
+                    jugadas: jugadas.filter(j => j.usuario.toLowerCase() === usuario.toLowerCase())
                 };
                 document.getElementById('form-login').style.display = 'none';
                 document.getElementById('form-jugar').style.display = 'block';
-                generarCartasPartidos(); // Inicializar la primera carta después de iniciar sesión
+                generarCartasPartidos(); // Inicializar las cartas de los partidos
+
+                // Mover a la primera carta del próximo partido no jugado
+                const proximoPartidoNoJugado = partidos.findIndex(partido => !esPartidoPasado(partido.fecha, partido.hora));
+                if (proximoPartidoNoJugado >= 0) {
+                    const carousel = new bootstrap.Carousel(document.querySelector('#partidos-container'));
+                    for (let i = 0; i < proximoPartidoNoJugado; i++) {
+                        carousel.next();
+                    }
+                }
             } else {
                 mostrarAlerta('Usuario o contraseña incorrectos', 'danger');
             }
@@ -136,15 +146,15 @@ const iniciarSesion = async (usuario, contrasena) => {
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
     }
-    cargarPosiciones();
 };
+
 
 const generarCartasPartidos = () => {
     const contenedorPartidos = document.getElementById("partidos");
     contenedorPartidos.innerHTML = '';
 
     partidos.forEach((partido, index) => {
-        const jugadaGuardada = usuarioActual.jugadas.find(jugada => jugada.partido === `${partido.equipo1} vs ${partido.equipo2}`);
+        const jugadaGuardada = usuarioActual.jugadas.find(jugada => jugada.partido.toLowerCase() === `${partido.equipo1.toLowerCase()} vs ${partido.equipo2.toLowerCase()}`);
         const partidoPasado = esPartidoPasado(partido.fecha, partido.hora);
 
         const resultado1 = jugadaGuardada && jugadaGuardada.resultado !== 'null-null' ? jugadaGuardada.resultado.split('-')[0] : '';
@@ -153,7 +163,7 @@ const generarCartasPartidos = () => {
         const card = document.createElement("div");
         card.className = "carousel-item" + (index === 0 ? " active" : "");
         card.innerHTML = `
-            <div class="card mx-auto" style="max-width: 18rem;">
+            <div class="card mx-auto" style="max-width: 18rem; position: relative;">
                 <div class="card-header">${partido.equipo1} vs ${partido.equipo2}</div>
                 <div class="card-body">
                     <p>${partido.fecha} ${partido.hora}</p>
@@ -166,6 +176,7 @@ const generarCartasPartidos = () => {
                         <input type="number" class="form-control" id="resultado-${partido.id}-${partido.equipo2}" name="resultado-${partido.id}-${partido.equipo2}" min="0" value="${resultado2}" ${partidoPasado ? 'disabled' : ''}>
                         <label for="resultado-${partido.id}-${partido.equipo2}">${partido.equipo2}:</label>
                     </div>
+                    ${partidoPasado ? '<div class="badge bg-danger" style="position: absolute; font-size: 12px; top: 80px; right: 90px; padding: 20px 15px; transform: rotate(-35deg);">Partido jugado</div>' : ''}
                 </div>
             </div>
         `;
@@ -174,9 +185,6 @@ const generarCartasPartidos = () => {
 
     actualizarBotonGuardar();
 };
-
-
-
 
 
 const mostrarPartidoSiguiente = () => {
@@ -278,7 +286,9 @@ const guardarJugada = async () => {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    cargarPartidos(); // Cargar partidos al cargar la página
+    cargarPartidos().then(() => {
+        cargarFechas(); // Llenar el selector de fechas después de cargar los partidos
+    });
     cargarPosiciones(); // Cargar posiciones al cargar la página
 
     const formRegistrarse = document.getElementById("form-registrarse");
@@ -318,12 +328,28 @@ document.addEventListener("DOMContentLoaded", () => {
     formMisJugadas.addEventListener("submit", (event) => {
         event.preventDefault();
         const nombreUsuario = document.getElementById("nombre-jugadas").value;
-        cargarMisJugadas(nombreUsuario);
+        const fechaSeleccionada = document.getElementById("fecha-jugadas").value;
+        cargarMisJugadas(nombreUsuario, fechaSeleccionada);
     });
+
+    cargarFechas(); // Llenar el selector de fechas
+
 
     cargarPosiciones();
 });
 
+
+const cargarFechas = () => {
+    const fechasUnicas = [...new Set(partidos.map(partido => partido.fecha))];
+    const selectFecha = document.getElementById("fecha-jugadas");
+
+    fechasUnicas.forEach(fecha => {
+        const option = document.createElement("option");
+        option.value = fecha;
+        option.textContent = fecha;
+        selectFecha.appendChild(option);
+    });
+};
 
 const cargarPosiciones = async () => {
 
@@ -434,7 +460,7 @@ const guardarResultado = async (resultado) => {
     cargarPosiciones();
 };
 
-const cargarMisJugadas = async (nombreUsuario) => {
+const cargarMisJugadas = async (nombreUsuario, fechaSeleccionada) => {
     try {
         const response = await fetch(`${API_URL}/latest`, {
             method: 'GET',
@@ -445,57 +471,66 @@ const cargarMisJugadas = async (nombreUsuario) => {
         if (response.ok) {
             const data = await response.json();
             const jugadas = Array.isArray(data.record.jugadas) ? data.record.jugadas : [];
-            const usuarioJugadas = jugadas.filter(j => j.usuario === nombreUsuario);
+            const usuarioJugadas = jugadas.filter(j => j.usuario.toLowerCase() === nombreUsuario.toLowerCase());
 
             const listaJugadas = document.getElementById('lista-jugadas');
             listaJugadas.innerHTML = '';
 
             if (usuarioJugadas.length > 0) {
-                const grupos = {
-                    'Grupo A': [],
-                    'Grupo B': [],
-                    'Grupo C': [],
-                    'Grupo D': []
-                };
-
-                usuarioJugadas.forEach(jugada => {
-                    const partido = partidos.find(p => `${p.equipo1} vs ${p.equipo2}` === jugada.partido);
-                    if (partido) {
-                        if (partido.id <= 6) {
-                            grupos['Grupo A'].push(jugada);
-                        } else if (partido.id <= 12) {
-                            grupos['Grupo B'].push(jugada);
-                        } else if (partido.id <= 18) {
-                            grupos['Grupo C'].push(jugada);
-                        } else {
-                            grupos['Grupo D'].push(jugada);
-                        }
-                    }
+                const jugadasFiltradas = fechaSeleccionada === "todas" ? usuarioJugadas : usuarioJugadas.filter(j => {
+                    const partido = partidos.find(p => `${p.equipo1} vs ${p.equipo2}` === j.partido);
+                    return partido && partido.fecha === fechaSeleccionada;
                 });
 
-                for (const [grupo, jugadas] of Object.entries(grupos)) {
-                    if (jugadas.length > 0) {
-                        const grupoDiv = document.createElement('div');
-                        grupoDiv.innerHTML = `<h3>${grupo}</h3>`;
-                        const tabla = document.createElement('table');
-                        tabla.className = 'tabla-jugadas table table-striped';
-                        tabla.innerHTML = `
-                            <tr>
-                                <th>Partido</th>
-                                <th>Resultado</th>
-                            </tr>
-                        `;
-                        jugadas.forEach(jugada => {
-                            const fila = document.createElement('tr');
-                            fila.innerHTML = `
-                                <td>${jugada.partido}</td>
-                                <td>${jugada.resultado}</td>
+                if (jugadasFiltradas.length > 0) {
+                    const grupos = {
+                        'Grupo A': [],
+                        'Grupo B': [],
+                        'Grupo C': [],
+                        'Grupo D': []
+                    };
+
+                    jugadasFiltradas.forEach(jugada => {
+                        const partido = partidos.find(p => `${p.equipo1} vs ${p.equipo2}` === jugada.partido);
+                        if (partido) {
+                            if (partido.id <= 6) {
+                                grupos['Grupo A'].push(jugada);
+                            } else if (partido.id <= 12) {
+                                grupos['Grupo B'].push(jugada);
+                            } else if (partido.id <= 18) {
+                                grupos['Grupo C'].push(jugada);
+                            } else {
+                                grupos['Grupo D'].push(jugada);
+                            }
+                        }
+                    });
+
+                    for (const [grupo, jugadas] of Object.entries(grupos)) {
+                        if (jugadas.length > 0) {
+                            const grupoDiv = document.createElement('div');
+                            grupoDiv.innerHTML = `<h3>${grupo}</h3>`;
+                            const tabla = document.createElement('table');
+                            tabla.className = 'tabla-jugadas table table-striped';
+                            tabla.innerHTML = `
+                                <tr>
+                                    <th>Partido</th>
+                                    <th>Resultado</th>
+                                </tr>
                             `;
-                            tabla.appendChild(fila);
-                        });
-                        grupoDiv.appendChild(tabla);
-                        listaJugadas.appendChild(grupoDiv);
+                            jugadas.forEach(jugada => {
+                                const fila = document.createElement('tr');
+                                fila.innerHTML = `
+                                    <td>${jugada.partido}</td>
+                                    <td>${jugada.resultado}</td>
+                                `;
+                                tabla.appendChild(fila);
+                            });
+                            grupoDiv.appendChild(tabla);
+                            listaJugadas.appendChild(grupoDiv);
+                        }
                     }
+                } else {
+                    listaJugadas.innerHTML = '<p>No se encontraron jugadas para la fecha seleccionada.</p>';
                 }
             } else {
                 listaJugadas.innerHTML = '<p>No se encontraron jugadas para este usuario.</p>';
@@ -504,8 +539,10 @@ const cargarMisJugadas = async (nombreUsuario) => {
     } catch (error) {
         console.error('Error al cargar las jugadas:', error);
     }
-    cargarPosiciones();
 };
+
+
+
 
 const eliminarUsuario = async (nombreUsuario) => {
     try {
