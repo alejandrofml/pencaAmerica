@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penca Copa América 2024</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <header class="bg-secondary text-white text-center">
         <nav class="navbar" style="background-color: #e3f2fd;">
@@ -15,7 +18,7 @@
                     <img src="./img/logo1.png" alt="Logo" height="50" class="d-inline-block align-text-top">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                    <img src="./img/menu.png" style="width: 15px;" alt="">
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
@@ -23,7 +26,7 @@
                         <li class="nav-item"><a class="nav-link" href="#posiciones" onclick="mostrarSeccion('posiciones')">Tabla de Posiciones</a></li>
                         <li class="nav-item"><a class="nav-link" href="#admin" onclick="mostrarSeccion('admin')">Administrador</a></li>
                         <li class="nav-item"><a class="nav-link" href="#mis-jugadas" onclick="mostrarSeccion('mis-jugadas')">Ver jugadas</a></li>
-                        <li class="nav-item"><button class="btn btn-outline-success" onclick="mostrarSeccion('registrarse')" type="button">Registrarse</button></li>
+                        <li class="nav-item"><button class="btn btn-outline-danger" onclick="mostrarSeccion('registrarse')" type="button">Registrarse</button></li>
                     </ul>
                 </div>
             </div>
@@ -65,28 +68,24 @@
                 <button type="submit" class="btn btn-outline-warning w-100">Iniciar Sesión</button>
             </form>
             <form id="form-jugar" class="mb-4" style="display:none;">
-                <div id="partidos-container" class="text-center carousel">
-                    <div id="partidos" class="carousel-inner">
+                <div id="partidos-container" class="swiper-container">
+                    <div id="partidos" class="swiper-wrapper">
                         <!-- Aquí se generarán las cartas de los partidos -->
                     </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#partidos-container" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#partidos-container" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
+                    <!-- Agrega controles de navegación de Swiper -->
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
                 </div>
                 <button type="submit" class="btn btn-outline-warning mt-3 w-100">Guardar Jugada</button>
             </form>
         </section>
-
+        
         <section id="posiciones" style="display:none;">
             <h2>Tabla de Posiciones</h2>
             <table class="table table-striped" id="tabla-posiciones">
                 <!-- Aquí se llenará la tabla de posiciones -->
             </table>
+            
         </section>
 
         <section id="admin" style="display:none;">
@@ -142,6 +141,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>
