@@ -9,7 +9,6 @@ let usuarioActual = {
 };
 
 
-
 const esPartidoPasado = (fecha, hora) => {
     const [dia, mes, anio] = fecha.split('/');
     const [horas, minutos] = hora.split(':');
@@ -148,6 +147,34 @@ const iniciarSesion = async (usuario, contrasena) => {
     }
 };
 
+const mostrarPopupPuntos = (puntosGanados, puntosTotales) => {
+    const popup = document.createElement('div');
+    popup.className = 'popup-puntos';
+    popup.innerHTML = `
+        <div class="popup-content">
+            <h2>¡Felicidades!</h2>
+            <p>Has ganado ${puntosGanados} puntos.</p>
+            <p>Tus puntos totales son ${puntosTotales}.</p>
+            <button class="btn btn-primary" onclick="cerrarPopup()">Cerrar</button>
+        </div>
+    `;
+    document.body.appendChild(popup);
+};
+
+const cerrarPopup = () => {
+    const popup = document.querySelector('.popup-puntos');
+    if (popup) {
+        document.body.removeChild(popup);
+    }
+};
+
+
+
+
+
+const encontrarProximoPartidoNoJugado = () => {
+    return partidos.findIndex(partido => !esPartidoPasado(partido.fecha, partido.hora));
+};
 
 const generarCartasPartidos = () => {
     const contenedorPartidos = document.getElementById("partidos");
@@ -160,9 +187,9 @@ const generarCartasPartidos = () => {
         const resultado1 = jugadaGuardada && jugadaGuardada.resultado !== 'null-null' ? jugadaGuardada.resultado.split('-')[0] : '';
         const resultado2 = jugadaGuardada && jugadaGuardada.resultado !== 'null-null' ? jugadaGuardada.resultado.split('-')[1] : '';
 
-        const card = document.createElement("div");
-        card.className = "carousel-item" + (index === 0 ? " active" : "");
-        card.innerHTML = `
+        const slide = document.createElement("div");
+        slide.className = "swiper-slide";
+        slide.innerHTML = `
             <div class="card mx-auto" style="max-width: 18rem; position: relative;">
                 <div class="card-header">${partido.equipo1} vs ${partido.equipo2}</div>
                 <div class="card-body">
@@ -180,11 +207,37 @@ const generarCartasPartidos = () => {
                 </div>
             </div>
         `;
-        contenedorPartidos.appendChild(card);
+        contenedorPartidos.appendChild(slide);
     });
 
     actualizarBotonGuardar();
+
+    // Encontrar el próximo partido no jugado
+    const proximoPartidoNoJugado = encontrarProximoPartidoNoJugado();
+
+    // Inicializar Swiper
+    new Swiper('.swiper-container', {
+        slidesPerView: 1,
+        spaceBetween: 10,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        keyboard: {
+            enabled: true,
+        },
+        grabCursor: true,
+        centeredSlides: true,
+        loop: true,
+        initialSlide: proximoPartidoNoJugado >= 0 ? proximoPartidoNoJugado : 0,
+    });
 };
+
+
 
 
 const mostrarPartidoSiguiente = () => {
@@ -230,6 +283,26 @@ const actualizarBotonGuardar = () => {
     const botonGuardar = document.querySelector("#form-jugar button[type='submit']");
     botonGuardar.disabled = false; // Asegurar que siempre esté habilitado
 };
+
+const obtenerPuntosUsuario = (jugadas, mapaResultados) => {
+    return jugadas.reduce((total, jugada) => {
+        const resultadoReal = mapaResultados[jugada.partido];
+        if (resultadoReal) {
+            const [goles1, goles2] = jugada.resultado.split('-').map(Number);
+            const [golesReal1, golesReal2] = resultadoReal.split('-').map(Number);
+
+            if (goles1 === golesReal1 && goles2 === golesReal2) {
+                return total + 3;
+            } else if ((goles1 > goles2 && golesReal1 > golesReal2) || 
+                       (goles1 < goles2 && golesReal2 > golesReal1) || 
+                       (goles1 === goles2 && golesReal1 === golesReal2)) {
+                return total + 1;
+            }
+        }
+        return total;
+    }, 0);
+};
+
 const guardarJugada = async () => {
     try {
         const response = await fetch(`${API_URL}/latest`, {
@@ -242,6 +315,17 @@ const guardarJugada = async () => {
         if (response.ok) {
             const data = await response.json();
             const jugadas = data.record.jugadas || [];
+            const resultados = data.record.resultados || [];
+
+            // Crear un mapa de resultados
+            const mapaResultados = {};
+            resultados.forEach(res => {
+                mapaResultados[res.partido] = res.resultado;
+            });
+
+            // Obtener puntos actuales del usuario
+            const puntosPrevios = obtenerPuntosUsuario(usuarioActual.jugadas, mapaResultados);
+
             const updatedJugadas = jugadas.filter(j => j.usuario !== usuarioActual.usuario);
 
             partidos.forEach((partido) => {
@@ -273,6 +357,16 @@ const guardarJugada = async () => {
             if (saveResponse.ok) {
                 mostrarAlerta('Jugadas guardadas correctamente', 'success');
                 usuarioActual.jugadas = [...updatedJugadas.filter(j => j.usuario === usuarioActual.usuario)];
+
+                // Obtener puntos nuevos del usuario
+                const puntosNuevos = obtenerPuntosUsuario(usuarioActual.jugadas, mapaResultados);
+
+                // Mostrar pop-up si los puntos han aumentado
+                if (puntosNuevos > puntosPrevios) {
+                    const puntosGanados = puntosNuevos - puntosPrevios;
+                    mostrarPopupPuntos(puntosGanados, puntosNuevos);
+                }
+
                 await cargarPosiciones(); // Actualizar la tabla de posiciones
             } else {
                 mostrarAlerta('Error al guardar las jugadas', 'danger');
@@ -281,8 +375,8 @@ const guardarJugada = async () => {
     } catch (error) {
         console.error('Error al guardar las jugadas:', error);
     }
-    cargarPosiciones();
 };
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
