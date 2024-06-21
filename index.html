@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <header class="bg-secondary text-white text-center py-3">
+    <header class="bg-secondary text-white text-center">
         <nav class="navbar" style="background-color: #e3f2fd;">
             <div class="container">
                 <a class="navbar-brand" href="#">
@@ -48,12 +48,11 @@
                     <label for="password-registro">Contraseña:</label>
                     <input type="password" class="form-control" id="password-registro" name="password-registro" required>
                 </div>
-                <button type="submit" class="btn btn-outline-secondary w-100">Registrarse</button>
+                <button type="submit" class="btn btn-outline-warning w-100">Registrarse</button>
             </form>
         </section>
 
         <section id="jugar">
-            <h2 class="text-center">Iniciar Sesión para Jugar</h2>
             <form id="form-login" class="mb-4 mx-auto" style="max-width: 400px;">
                 <div class="form-group mb-3">
                     <label for="nombre">Nombre de Usuario:</label>
@@ -63,7 +62,7 @@
                     <label for="password">Contraseña:</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
-                <button type="submit" class="btn btn-outline-secondary w-100">Iniciar Sesión</button>
+                <button type="submit" class="btn btn-outline-warning w-100">Iniciar Sesión</button>
             </form>
             <form id="form-jugar" class="mb-4" style="display:none;">
                 <div id="partidos-container" class="text-center carousel">
@@ -79,7 +78,7 @@
                         <span class="visually-hidden">Next</span>
                     </button>
                 </div>
-                <button type="submit" class="btn btn-outline-success mt-3 w-100">Guardar Jugada</button>
+                <button type="submit" class="btn btn-outline-warning mt-3 w-100">Guardar Jugada</button>
             </form>
         </section>
 
@@ -102,7 +101,7 @@
                         <label for="password-admin">Contraseña:</label>
                         <input type="password" class="form-control" id="password-admin" name="password-admin" required>
                     </div>
-                    <button type="submit" class="btn btn-outline-secondary w-100">Ingresar</button>
+                    <button type="submit" class="btn btn-outline-warning w-100">Ingresar</button>
                 </form>
             </div>
             <div id="admin-content" style="display:none;">
@@ -126,7 +125,14 @@
                     <label for="nombre-jugadas">Nombre del usuario:</label>
                     <input type="text" class="form-control" id="nombre-jugadas" name="nombre-jugadas" required>
                 </div>
-                <button type="submit" class="btn btn-outline-secondary w-100">Ver jugada</button>
+                <div class="form-group">
+                    <label for="fecha-jugadas">Fecha:</label>
+                    <select class="form-control" id="fecha-jugadas" name="fecha-jugadas">
+                        <option value="todas">Todas</option>
+                        <!-- Aquí se llenarán las opciones de fecha -->
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-outline-warning w-100">Ver jugada</button>
             </form>
             <div id="lista-jugadas">
                 <!-- Aquí se mostrarán las jugadas del usuario -->
