@@ -5,39 +5,69 @@ body {
     font-family: Arial, sans-serif;
 }
 
-header {
-    background-color: rgba(0, 0, 0, 0.8); /* Fondo semitransparente */
-    
-}
+
 
 header h1 {
     font-size: 2rem;
 }
 
-nav.navbar {
-    background-color: rgba(0, 0, 0, 0.8); /* Fondo semitransparente */
+
+nav.navbar{
+    color: rgb(50, 80, 234);
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
 }
 
-.navbar-light .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(0, 0, 0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-  }
-nav.navbar a {
-    color: rgb(50, 80, 234);
-}
 
 nav.navbar a:hover{
     color: rgb(234, 50, 50);
 }
+
 main.container {
     background-color: rgba(0, 0, 0, 0.7); /* Fondo semitransparente */
     padding: 3rem;
-    border-radius: 8px;
+    border-radius: 2rem;
     margin-top: 1rem;
 }
+
+/* Añadir este CSS en tu archivo de estilos */
+.popup-puntos {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    color: black;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.popup-content h2 {
+    margin-top: 0;
+}
+
+.popup-content p {
+    margin: 10px 0;
+}
+
+
 
 .card {
     background-color: rgba(255, 255, 255, 0.9);
     color: black;
+    margin: 0 auto;
 }
 
 .card-header {
@@ -75,6 +105,10 @@ main.container {
     background-color: black; /* Cambia el color de las flechas a negro */
 }
 
+form{
+    text-align: center;
+}
+
 .form-group, .form-floating {
     text-align: center;
 }
@@ -82,6 +116,13 @@ main.container {
 input[type="text"], input[type="password"], input[type="number"] {
     margin: 0 auto;
     display: block;
+}
+
+#posiciones{
+    text-align: center;
+}
+#tabla-posiciones{
+    text-align: left;
 }
 
 #partidos-container {
