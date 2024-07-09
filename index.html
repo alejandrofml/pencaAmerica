@@ -24,9 +24,10 @@
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item"><a class="nav-link" href="#jugar" onclick="mostrarSeccion('jugar')">Jugar</a></li>
                         <li class="nav-item"><a class="nav-link" href="#posiciones" onclick="mostrarSeccion('posiciones')">Tabla de Posiciones</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#admin" onclick="mostrarSeccion('admin')">Administrador</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#mis-jugadas" onclick="mostrarSeccion('mis-jugadas')">Ver jugadas</a></li>
-                        <li class="nav-item"><button class="btn btn-outline-danger" onclick="mostrarSeccion('registrarse')" type="button">Registrarse</button></li>
+                        <li class="nav-item" id="btnAdminSeccion" style="display: none;"><a class="nav-link" href="#admin" onclick="mostrarSeccion('admin')">Administrador</a></li>
+                        <li class="nav-item" ><a class="nav-link" href="#mis-jugadas" onclick="mostrarSeccion('mis-jugadas')">Ver jugadas</a></li>
+                        <button id="btn-logout" style="display: none;">Cerrar Sesión</button>
+                        <li class="nav-item" style="display: none;"><button class="btn btn-outline-danger" onclick="mostrarSeccion('registrarse')" type="button">Registrarse</button></li>
                     </ul>
                 </div>
             </div>
@@ -111,19 +112,39 @@
                     </div>
                     <button type="submit" class="btn btn-outline-danger w-100">Eliminar Usuario</button>
                 </form>
+                <form id="form-agregar-partido" class="mb-4 mx-auto" style="max-width: 400px;">
+                    <div class="form-group mb-3">
+                        <label for="equipo1">Equipo 1:</label>
+                        <input type="text" class="form-control" id="equipo1" name="equipo1" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="equipo2">Equipo 2:</label>
+                        <input type="text" class="form-control" id="equipo2" name="equipo2" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="fecha-partido">Fecha:</label>
+                        <input type="date" class="form-control" id="fecha-partido" name="fecha-partido" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="hora-partido">Hora:</label>
+                        <input type="time" class="form-control" id="hora-partido" name="hora-partido" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="estadio">Estadio:</label>
+                        <input type="text" class="form-control" id="estadio" name="estadio" required>
+                    </div>
+                    <button type="submit" class="btn btn-outline-success w-100">Agregar Partido</button>
+                </form>
                 <div id="resultados-partidos">
                     <!-- Aquí se generarán las cartas de los partidos para ingresar resultados -->
                 </div>
             </div>
         </section>
+        
 
         <section id="mis-jugadas" style="display:none;">
-            <h2 class="text-center">Ver la jugada de: </h2>
+            <h2 class="text-center">Ver jugadas por fecha:</h2>
             <form id="form-mis-jugadas" class="mb-4 mx-auto" style="max-width: 400px;">
-                <div class="form-group mb-3">
-                    <label for="nombre-jugadas">Nombre del usuario:</label>
-                    <input type="text" class="form-control" id="nombre-jugadas" name="nombre-jugadas" required>
-                </div>
                 <div class="form-group">
                     <label for="fecha-jugadas">Fecha:</label>
                     <select class="form-control" id="fecha-jugadas" name="fecha-jugadas">
@@ -131,12 +152,21 @@
                         <!-- Aquí se llenarán las opciones de fecha -->
                     </select>
                 </div>
-                <button type="submit" class="btn btn-outline-warning w-100">Ver jugada</button>
+                <button type="submit" class="btn btn-outline-warning w-100">Ver jugadas</button>
             </form>
+            <button id="boton-hoy" class="btn btn-outline-primary w-100 mb-4">Mostrar jugadas del próximo partido</button>
             <div id="lista-jugadas">
                 <!-- Aquí se mostrarán las jugadas del usuario -->
             </div>
         </section>
+        <div id="alert-container"></div>
+        <div id="loader" style="display: none; text-align: center;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+        
+        
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
